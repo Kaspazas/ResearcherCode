@@ -31,36 +31,44 @@ countries.to_csv("country_list_and_codes.csv") #saves DataFrame as a csv
 #Google#
 ########
 #This section uses HTML adresses to go through data, as opposed to having to navigate a page (which is needed later)
-url = "https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:LT;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
-#url = "https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:XX;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
-
-for code in countries["ISO CODES"]:
-    url.replace("XX",str(code))
-
-#Using Selenium, this section navigates to the pages (where the
-search_url="https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:LT;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
-
+#url = "https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:LT;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
+url = "https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:XX;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
+current_code = "XX"
 driver = webdriver.Chrome()
-driver.get(search_url) #navigates to the website
-time.sleep(3) #wait for page to load
-driver.find_element(By.CLASS_NAME, "element-row.expandable").click() #closes an expandable selection, cause otherwise downloaded elements would be polluted
-table_data = driver.find_elements(By.CLASS_NAME, "md-lite mat-row") #downloads relevant elements
+for code in countries["ISO CODES"]:
 
-google_data = pd.DataFrame()
+    url = url.replace(str(current_code),str(code))
+    current_code = code
+    #Using Selenium, this section navigates to the pages (where the
+    #search_url="https://transparencyreport.google.com/user-data/overview?hl=en&user_requests_report_period=series:requests,accounts;authority:LT;time:&lu=user_requests_report_period&legal_process_breakdown=expanded:0"
 
-i = 0
-while i<len(table_data):
-    row = pd.DataFrame(table_data[i].text.split("\n")).transpose()
-    count = table_data[i].text.split("\n")
-    country = code
-    if len(count) == 1:
-        print("skipping, no data at ", i)
-        i += 1
+    driver.get(url) #navigates to the website
+    time.sleep(2) #wait for page to load
+    #driver.find_element(By.CLASS_NAME, "element-row.expandable").click() #closes an expandable selection, cause otherwise downloaded elements would be polluted
+    table_data = driver.find_elements(By.CLASS_NAME, "md-lite mat-row") #downloads relevant elements
+    if len(table_data) == 0:
         continue
     else:
-        google_data = pd.concat([google_data, row], axis=0, ignore_index=True)
-        #google_data = pd.concat([google_data,country], axis=1, ignore_index=True)
-        i += 1
+
+        google_data = pd.DataFrame()
+
+        i = 0
+        while i<len(table_data):
+            row = pd.DataFrame(table_data[i].text.split("\n")).transpose()
+            count = table_data[i].text.split("\n")
+            country = code
+            if len(count) == 1:
+                print("skipping, no data at ", i)
+                i += 1
+                continue
+            else:
+                google_data = pd.concat([google_data, row], axis=0, ignore_index=True)
+                #google_data = pd.concat([google_data,country], axis=1, ignore_index=True)
+                i += 1
+        google_data.columns = ["Period","Requests","Accounts","%Produced"]#,"Country"]
+        google_data = google_data[google_data["Period"].str.contains("2020|2019")==True]
+
+
 
 
 
