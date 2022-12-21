@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 #Country codes are collected to be used as a guide for what countries we're looking for.
 #These codes are also later used in scraping Google and Facebook data
 #It could also be used to highlight any mismatch in country listings by the companies being analysed
+
 url = "https://www.iso.org/obp/ui/#search"
 driver = webdriver.Chrome() #initialize automated browser
 driver.get(url) #navigates to the website
@@ -38,13 +39,21 @@ countries.columns = countries.iloc[0] #sets column names based on first entries
 countries = countries.drop(countries.index[0]) #removes the non needed first row
 
 countries = pd.concat([countries,pd.DataFrame({"English short name":["Kosovo"], "Alpha-2 code":["XK"]})]) #adds Kosovo, because it wasn't in the list, but Google has a report for it
-countries = pd.concat([countries,pd.DataFrame({"English short name":[" Netherlands Antilles"], "Alpha-2 code":["AN"]})]) #adds Netherlands Antilles, because it wasn't in the original list, but is included by Facebook
-countries.to_csv("country_list_and_codes.csv") #saves table as csv
-countries = pd.read_csv("country_list_and_codes.csv").iloc[:,1:]
+countries = pd.concat([countries,pd.DataFrame({"English short name":["Netherlands Antilles"], "Alpha-2 code":["AN"]})]) #adds Netherlands Antilles, because it wasn't in the original list, but is included by Facebook
 
-#################
-#Population data#
-#################
+i = 0
+while i < len(countries):
+    countries["English short name"][i] = countries["English short name"][i].replace("(the)","")
+    i +=1
+
+countries["English short name"][216] = "Taiwan" #Changes the name of "Taiwan (province of China)" to Taiwan (because that is more standart)
+countries["English short name"][118] = "South Korea" #Changes the name of "Korea (republic of)" to South Korea (because that is more standart)
+countries["Alpha-2 code"][152] = "NA" #Changes Alpha code of Namibia because it was saved as nan (no data)
+
+countries.to_csv("country_list_and_codes.csv") #saves table as csv
+#countries = pd.read_csv("country_list_and_codes.csv").iloc[:,1:]
+
+
 
 
 

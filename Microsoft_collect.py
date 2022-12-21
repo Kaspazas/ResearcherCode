@@ -6,7 +6,7 @@ import itertools
 #Microsoft#
 ###########
 #Microsoft only provides file links, so they are used
-#These are quite inconveniently constructed, so to process them with code, the script is verbose to be understandable
+#These are quite inconveniently constructed, so to process them with code, the script is verbose and prolongued to be understandable to others
 file_names = ["MS_19_1.xlsx", "MS_19_2.xlsx", "MS_20_1.xlsx", "MS_20_2.xlsx"] #list of filenames to be used in storing downloaded files
 urls = ["https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE49sEF", "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE4sg0d", #list of urls where CSV's are available
         "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RE4GuvI", "https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWAlQ4"]
@@ -134,12 +134,12 @@ while i < len(countries_in_ms): #loop that goes through country names and saves 
                 x += 1
                 continue
 
-        ms_data = pd.concat([ms_data, pd.DataFrame(row).transpose()])
+        ms_data = pd.concat([ms_data, pd.DataFrame(row).transpose()]) #combines existing dataframe with the current row
         y += 1
     i += 1
 
 ms_data.columns = ["Period", "Country", "Requests", "Produced", "Accounts"]  # changes column names
 
-#save data as backup
+#save data as backup / for final use
 ms_data.to_csv("microsoft_data.csv")
 #ms_data = pd.read_csv("microsoft_data.csv").iloc[:,1:]

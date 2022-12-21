@@ -1,12 +1,14 @@
 import pandas as pd
 from zipfile import ZipFile
 import itertools
+import requests
 
 #######
 #Apple#
 #######
 #Apple could also be scraped, but the way they provide downloadable reports is used here to highlight familiarity with a different skill, navigating and organising data through code
-url = "https://www.apple.com/legal/zip/transparency/Apple_Transparency_Report.zip"
+
+url = "https://www.apple.com/legal/zip/transparency/Apple_Transparency_Report.zip" #loads url of data
 file = requests.get(url) #downloads file
 open("Apple.zip", "wb").write(file.content) #writes file into local storage
 
@@ -91,6 +93,6 @@ while i < len(apple_countries): #loop that goes through country names and saves 
 
 apple_data.columns = ["Period","Country","Requests","Produced","Accounts"] #changes column names
 
-#save data as backup
+#save data as backup / for final use
 apple_data.to_csv("apple_data.csv")
 #apple_data = pd.read_csv("apple_data.csv").iloc[:,1:]

@@ -7,7 +7,9 @@ import time
 #Facebook#
 ##########
 #Like other platforms, Facebook could be done by downloading the provided CSV's, but scarping is used to show familiarity with the skill
-countries = pd.read_csv("country_list_and_codes.csv").iloc[:,1:]
+#Note that the lines using "By.CLASS_NAME" might stop working because the current class names are indicative of anti-scraping procedures and thus the class names themselves might change
+
+countries = pd.read_csv("country_list_and_codes.csv").iloc[:,1:] #loads list of countries
 driver = webdriver.Chrome()#initialize automated browser
 fb_data = pd.DataFrame()#creates a blank dataframe to store data in later
 url = "https://transparency.fb.com/data/government-data-requests/country/XX/"
@@ -18,10 +20,10 @@ driver.find_element(By.CLASS_NAME, "_9o-r ._9o-t").click() #accepts cookies
 time.sleep(2)
 
 for code in countries["Alpha-2 code"]: #see google data collection for next 4 lines
-    time.sleep(2)
-    url = url.replace(str(current_code),str(code))
-    current_code = code
-    driver.get(url)
+    time.sleep(2) #wait for page to load
+    url = url.replace(str(current_code),str(code)) #replace url with a new one
+    current_code = code #store current code so that we know what to replace
+    driver.get(url) #navigate to the site
     validity_check = driver.find_element(By.CLASS_NAME, "_9qfj").text #used to check the title text of a page
 
     if validity_check == "Requests by country": #if requests by country - the country code attempted is not used by Facebook
@@ -60,5 +62,18 @@ while i < len(fb_data["%Produced"]):
 
 fb_data.columns = ["Period","Country","Requests","Produced","Accounts"]
 
+#Changing country codes to previously collected country names
+fb_data = pd.read_csv("fb_data.csv").iloc[:,1:]
+i = 0
+while i <len(fb_data): #For every country in the fb data list
+    x = 0
+    while x <len(countries): #for every country in the country list
+        if fb_data.iloc[i,1] == countries.iloc[x,1]: #If the Alpha-2 of the country currently selected from FB list matches the currently selected country code from countries list
+            fb_data.iloc[i,1] = countries.iloc[x,0] #Change country alpha-2 in FB list to appropriate english name
+            x += 1
+        else:
+            x += 1
+    i += 1
+
+#save data as backup / for final use
 fb_data.to_csv("fb_data_fin.csv")
-#fb_data_fin = pd.read_csv("fb_data_fin.csv").iloc[:,1:]
